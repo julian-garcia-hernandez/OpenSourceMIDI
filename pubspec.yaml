@@ -7,8 +7,11 @@ environment:
   sdk: ^3.10.4
 
 dependencies:
+  async: ^2.13.0
   flutter:
     sdk: flutter
+  flutter_midi_command: ^0.5.3
+  foundation: ^0.0.5
 
 dev_dependencies:
   flutter_test:
