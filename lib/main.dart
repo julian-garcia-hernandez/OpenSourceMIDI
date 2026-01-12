@@ -14,7 +14,11 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: Scaffold(body: Center(child: ScaleGenerator())),
+      home: Scaffold(
+        body: Center(
+          child: Column(children: [ScaleGenerator(), ChordGenerator()]),
+        ),
+      ),
     );
   }
 }
@@ -111,6 +115,52 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
           },
         ),
         Text("this is the scale in its midi numbered format $scale"),
+      ],
+    );
+  }
+}
+
+class ChordGenerator extends StatefulWidget {
+  const ChordGenerator({super.key});
+
+  @override
+  ChordGeneratorState createState() => ChordGeneratorState();
+}
+
+class ChordGeneratorState extends State<ChordGenerator> {
+  List<int> pretendScale = [60, 62, 64, 65, 67, 69, 71];
+  List<List<int>> chords = [];
+  bool isMajorChecked = false, isMinorChecked = false;
+
+  var chordTypeChecks = {"Major": false, "Minor": false};
+
+  void generateChords() {}
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        CheckboxListTile(
+          title: Text("Major"),
+          value: chordTypeChecks["Major"],
+          onChanged: (bool? value) {
+            setState(() {
+              chordTypeChecks["Major"] = value!;
+            });
+          },
+        ),
+        CheckboxListTile(
+          title: Text("Minor"),
+          value: chordTypeChecks["Minor"],
+          onChanged: (bool? value) {
+            setState(() {
+              chordTypeChecks["Minor"] = value!;
+            });
+          },
+        ),
+        Text(
+          "these are the chords for the scale you have selected (HARDCODED for now): $chords",
+        ),
       ],
     );
   }
