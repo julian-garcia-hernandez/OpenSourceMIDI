@@ -120,6 +120,8 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
   }
 }
 
+List<int> majorChord = [0, 4, 7], minorChord = [0, 3, 7];
+
 class ChordGenerator extends StatefulWidget {
   const ChordGenerator({super.key});
 
@@ -128,13 +130,49 @@ class ChordGenerator extends StatefulWidget {
 }
 
 class ChordGeneratorState extends State<ChordGenerator> {
-  List<int> pretendScale = [60, 62, 64, 65, 67, 69, 71];
+  List<int> scale = [60, 62, 64, 65, 67, 69, 71];
   List<List<int>> chords = [];
-  bool isMajorChecked = false, isMinorChecked = false;
 
-  var chordTypeChecks = {"Major": false, "Minor": false};
+  Map<String, bool> chordTypeChecks = {"Major": false, "Minor": false};
+  List<int> chord = [];
+  //just have this generate the major triads that are valid in the scale
+  void generateChords() {
+    /*
+    we have to use majorChord intervals
+    build each chord out as a set
+    if every member of that chordSet is a member of the scale
+    check first if every member of the chord is there for each member do that check
+    that way we don't waste time building out a chord and then checking validity
+    we do validity checks at every step, no time wasting
+      append it
+    otherwise don't append it
 
-  void generateChords() {}
+    we have to go through every step in scale (hardcoded for now)
+    set each index as the root
+    
+    so this works, except that now there is not enough degrees in the scale for the scales that come later like 72
+    for example F Major is [65, 69, 72] but the problem is that there is no 72 in the scale
+      it only goes up to 71
+    */
+    int root = 0, scaleDegree = 0, interval = 0;
+    for (var i = 0; i < scale.length; ++i) {
+      root = scale[i];
+      for (var j = 0; j < majorChord.length; ++j) {
+        interval = majorChord[j];
+        scaleDegree = root + interval;
+        if (!(scale.contains(scaleDegree))) {
+          chord.clear();
+          break;
+        }
+        chord.add(scaleDegree);
+      }
+      if (chord.isNotEmpty) {
+        chords.add(List.from(chord));
+        chord.clear();
+      }
+    }
+    debugPrint("$chords");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +184,7 @@ class ChordGeneratorState extends State<ChordGenerator> {
           onChanged: (bool? value) {
             setState(() {
               chordTypeChecks["Major"] = value!;
+              generateChords();
             });
           },
         ),
