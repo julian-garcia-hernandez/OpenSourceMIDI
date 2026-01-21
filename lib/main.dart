@@ -23,30 +23,50 @@ class MainApp extends StatelessWidget {
   }
 }
 
-Map<String, List<int>> intervalSequencing = {
-  "Ionian": [2, 2, 1, 2, 2, 2, 1],
-  "Dorian": [2, 1, 2, 2, 2, 1, 2],
-  "Phrygian": [1, 2, 2, 2, 1, 2, 2],
-  "Lydian": [2, 2, 2, 1, 2, 2, 1],
-  "Mixolydian": [2, 2, 1, 2, 2, 1, 2],
-  "Aeolian": [2, 1, 2, 2, 1, 2, 2],
-  "Locrian": [1, 2, 2, 1, 2, 2, 2],
+enum DiatonicMode {
+  ionian,
+  dorian,
+  phrygian,
+  lydian,
+  mixolydian,
+  aeolian,
+  locrian,
+}
+
+Map<DiatonicMode, List<int>> intervalSequencing = {
+  DiatonicMode.ionian: [2, 2, 1, 2, 2, 2, 1],
+  DiatonicMode.dorian: [2, 1, 2, 2, 2, 1, 2],
+  DiatonicMode.phrygian: [1, 2, 2, 2, 1, 2, 2],
+  DiatonicMode.lydian: [2, 2, 2, 1, 2, 2, 1],
+  DiatonicMode.mixolydian: [2, 2, 1, 2, 2, 1, 2],
+  DiatonicMode.aeolian: [2, 1, 2, 2, 1, 2, 2],
+  DiatonicMode.locrian: [1, 2, 2, 1, 2, 2, 2],
 };
 
-Map<String, int> midiTonic = {
-  "C": 60,
-  "C#": 61,
-  "D": 62,
-  "D#": 63,
-  "E": 64,
-  "F": 65,
-  "F#": 66,
-  "G": 67,
-  "G#": 68,
-  "A": 69,
-  "A#": 70,
-  "B": 71,
+enum ChordType { major, minor }
+
+Map<ChordType, List<int>> chordSequencing = {
+  ChordType.major: [0, 4, 7],
+  ChordType.minor: [0, 3, 7],
 };
+
+enum Tonic {
+  c(60),
+  cSharp(61),
+  d(62),
+  dSharp(63),
+  e(64),
+  f(65),
+  fSharp(66),
+  g(67),
+  gSharp(68),
+  a(69),
+  aSharp(70),
+  b(71);
+
+  const Tonic(this.midiNote);
+  final int midiNote;
+}
 
 class ScaleGenerator extends StatefulWidget {
   const ScaleGenerator({super.key});
@@ -57,16 +77,17 @@ class ScaleGenerator extends StatefulWidget {
 
 class ScaleGeneratorState extends State<ScaleGenerator> {
   List<int>? scale = [60, 62, 64, 65, 67, 69, 71], intervalSequence = [];
-  String? selectedMode = "Ionian", selectedTonic = "C";
+  DiatonicMode? selectedMode = DiatonicMode.ionian;
+  Tonic selectedTonic = Tonic.c; //this is c by default -> maps to 60
 
   void generateScale() {
     int intervalSum = 0;
     intervalSequence = intervalSequencing[selectedMode];
     scale = intervalSequence?.map((interval) {
       intervalSum += interval;
-      return midiTonic[selectedTonic]! + intervalSum;
+      return selectedTonic.midiNote + intervalSum;
     }).toList();
-    scale?.insert(0, midiTonic[selectedTonic]!);
+    scale?.insert(0, selectedTonic.midiNote);
   }
 
   @override
@@ -85,8 +106,9 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
             DropdownMenuEntry(value: "Locrian", label: "Locrian"),
           ],
           onSelected: (String? mode) {
+            mode = mode!.toLowerCase();
             setState(() {
-              selectedMode = mode;
+              selectedMode = DiatonicMode.values.byName(mode!);
               generateScale();
             });
           },
@@ -109,7 +131,7 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
           ],
           onSelected: (String? tonic) {
             setState(() {
-              selectedTonic = tonic;
+              selectedTonic = Tonic.values.byName(tonic!);
               generateScale();
             });
           },
@@ -122,6 +144,12 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
 
 List<int> majorChord = [0, 4, 7], minorChord = [0, 3, 7];
 
+class Chord {
+  Chord({required this.type, required this.midiNotes});
+  ChordType type;
+  List<int> midiNotes = [];
+}
+
 class ChordGenerator extends StatefulWidget {
   const ChordGenerator({super.key});
 
@@ -131,10 +159,8 @@ class ChordGenerator extends StatefulWidget {
 
 class ChordGeneratorState extends State<ChordGenerator> {
   List<int> scale = [60, 62, 64, 65, 67, 69, 71];
-  List<List<int>> chords = [];
-
+  List<Chord> chords = [];
   Map<String, bool> chordTypeChecks = {"Major": false, "Minor": false};
-  List<int> chord = [];
   //just have this generate the major triads that are valid in the scale
   void generateChords() {
     /*
@@ -155,20 +181,20 @@ class ChordGeneratorState extends State<ChordGenerator> {
       it only goes up to 71
     */
     int root = 0, scaleDegree = 0, interval = 0;
+    List<int> midiNotes = [];
     for (var i = 0; i < scale.length; ++i) {
       root = scale[i];
       for (var j = 0; j < majorChord.length; ++j) {
         interval = majorChord[j];
         scaleDegree = root + interval;
         if (!(scale.contains(scaleDegree))) {
-          chord.clear();
+          midiNotes.clear();
           break;
         }
-        chord.add(scaleDegree);
+        midiNotes.add(scaleDegree);
       }
-      if (chord.isNotEmpty) {
-        chords.add(List.from(chord));
-        chord.clear();
+      if (midiNotes.isNotEmpty) {
+        chords.add(Chord(type: ChordType.major, midiNotes: midiNotes));
       }
     }
     debugPrint("$chords");
