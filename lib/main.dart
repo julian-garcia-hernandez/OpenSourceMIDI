@@ -14,11 +14,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Column(children: [ScaleGenerator(), ChordGenerator()]),
-        ),
-      ),
+      home: Scaffold(body: Center(child: ScaleGenerator())),
     );
   }
 }
@@ -44,11 +40,6 @@ Map<DiatonicMode, List<int>> intervalSequencing = {
 };
 
 enum ChordType { major, minor }
-
-Map<ChordType, List<int>> chordSequencing = {
-  ChordType.major: [0, 4, 7],
-  ChordType.minor: [0, 3, 7],
-};
 
 enum Tonic {
   c(60),
@@ -76,18 +67,19 @@ class ScaleGenerator extends StatefulWidget {
 }
 
 class ScaleGeneratorState extends State<ScaleGenerator> {
-  List<int>? scale = [60, 62, 64, 65, 67, 69, 71], intervalSequence = [];
+  List<int>? generatedScale = [60, 62, 64, 65, 67, 69, 71, 72],
+      intervalSequence = [];
   DiatonicMode? selectedMode = DiatonicMode.ionian;
-  Tonic selectedTonic = Tonic.c; //this is c by default -> maps to 60
+  Tonic selectedTonic = Tonic.c;
 
   void generateScale() {
     int intervalSum = 0;
     intervalSequence = intervalSequencing[selectedMode];
-    scale = intervalSequence?.map((interval) {
+    generatedScale = intervalSequence?.map((interval) {
       intervalSum += interval;
       return selectedTonic.midiNote + intervalSum;
     }).toList();
-    scale?.insert(0, selectedTonic.midiNote);
+    generatedScale?.insert(0, selectedTonic.midiNote);
   }
 
   @override
@@ -116,18 +108,18 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
         DropdownMenu(
           label: Text("Tonic"),
           dropdownMenuEntries: <DropdownMenuEntry<String>>[
-            DropdownMenuEntry(value: "C", label: "C"),
-            DropdownMenuEntry(value: "C#", label: "C#"),
-            DropdownMenuEntry(value: "D", label: "D"),
-            DropdownMenuEntry(value: "D#", label: "D#"),
-            DropdownMenuEntry(value: "E", label: "E"),
-            DropdownMenuEntry(value: "F", label: "F"),
-            DropdownMenuEntry(value: "F#", label: "F#"),
-            DropdownMenuEntry(value: "G", label: "G"),
-            DropdownMenuEntry(value: "G#", label: "G#"),
-            DropdownMenuEntry(value: "A", label: "A"),
-            DropdownMenuEntry(value: "A#", label: "A#"),
-            DropdownMenuEntry(value: "B", label: "B"),
+            DropdownMenuEntry(value: "c", label: "C"),
+            DropdownMenuEntry(value: "cSharp", label: "C#"),
+            DropdownMenuEntry(value: "d", label: "D"),
+            DropdownMenuEntry(value: "dSharp", label: "D#"),
+            DropdownMenuEntry(value: "e", label: "E"),
+            DropdownMenuEntry(value: "f", label: "F"),
+            DropdownMenuEntry(value: "fSharp", label: "F#"),
+            DropdownMenuEntry(value: "g", label: "G"),
+            DropdownMenuEntry(value: "gSharp", label: "G#"),
+            DropdownMenuEntry(value: "a", label: "A"),
+            DropdownMenuEntry(value: "aSharp", label: "A#"),
+            DropdownMenuEntry(value: "b", label: "B"),
           ],
           onSelected: (String? tonic) {
             setState(() {
@@ -136,13 +128,37 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
             });
           },
         ),
-        Text("this is the scale in its midi numbered format $scale"),
+        Text(
+          "this is the generated scale in its midi numbered format $generatedScale",
+        ),
+        InheritedScale(scale: generatedScale!, child: ChordGenerator()),
       ],
     );
   }
 }
 
-List<int> majorChord = [0, 4, 7], minorChord = [0, 3, 7];
+//this is immutable, it will only pass data down to its children, chord generator which will then generate the chords
+class InheritedScale extends InheritedWidget {
+  const InheritedScale({super.key, required this.scale, required super.child});
+  final List<int> scale;
+  static InheritedScale? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<InheritedScale>();
+  }
+
+  static InheritedScale of(BuildContext context) {
+    final InheritedScale? result = maybeOf(context);
+    assert(result != null, 'No InheritedScale found in context');
+    return result!;
+  }
+
+  @override
+  bool updateShouldNotify(InheritedScale oldWidget) => scale != oldWidget.scale;
+}
+
+Map<ChordType, List<int>> chordIntervals = {
+  ChordType.major: [0, 4, 7],
+  ChordType.minor: [0, 3, 7],
+};
 
 class Chord {
   Chord({required this.type, required this.midiNotes});
@@ -158,46 +174,41 @@ class ChordGenerator extends StatefulWidget {
 }
 
 class ChordGeneratorState extends State<ChordGenerator> {
-  List<int> scale = [60, 62, 64, 65, 67, 69, 71];
+  List<int> midiIntervals = [], midiScale = [];
   List<Chord> chords = [];
   Map<String, bool> chordTypeChecks = {"Major": false, "Minor": false};
-  //just have this generate the major triads that are valid in the scale
   void generateChords() {
-    /*
-    we have to use majorChord intervals
-    build each chord out as a set
-    if every member of that chordSet is a member of the scale
-    check first if every member of the chord is there for each member do that check
-    that way we don't waste time building out a chord and then checking validity
-    we do validity checks at every step, no time wasting
-      append it
-    otherwise don't append it
-
-    we have to go through every step in scale (hardcoded for now)
-    set each index as the root
-    
-    so this works, except that now there is not enough degrees in the scale for the scales that come later like 72
-    for example F Major is [65, 69, 72] but the problem is that there is no 72 in the scale
-      it only goes up to 71
-    */
     int root = 0, scaleDegree = 0, interval = 0;
-    List<int> midiNotes = [];
-    for (var i = 0; i < scale.length; ++i) {
-      root = scale[i];
-      for (var j = 0; j < majorChord.length; ++j) {
-        interval = majorChord[j];
+    List<int> chordMidiNotes = [];
+    midiScale = InheritedScale.of(context).scale;
+    midiIntervals = midiScale.map<int>((midiNote) {
+      midiNote %= 12;
+      return midiNote;
+    }).toList();
+
+    for (var i = 0; i < midiScale.length; ++i) {
+      root = midiScale[i];
+      for (var j = 0; j < chordIntervals[ChordType.major]!.length; ++j) {
+        interval = chordIntervals[ChordType.major]![j];
         scaleDegree = root + interval;
-        if (!(scale.contains(scaleDegree))) {
-          midiNotes.clear();
+        if (!(midiIntervals.contains(scaleDegree % 12))) {
+          chordMidiNotes.clear();
           break;
         }
-        midiNotes.add(scaleDegree);
+        chordMidiNotes.add(scaleDegree);
       }
-      if (midiNotes.isNotEmpty) {
-        chords.add(Chord(type: ChordType.major, midiNotes: midiNotes));
+      if (chordMidiNotes.isNotEmpty) {
+        chords.add(
+          Chord(type: ChordType.major, midiNotes: [...chordMidiNotes]),
+        );
+        chordMidiNotes.clear();
       }
     }
     debugPrint("$chords");
+  }
+
+  void deleteChords() {
+    chords.removeWhere((chord) => chord.type == ChordType.major);
   }
 
   @override
@@ -210,7 +221,11 @@ class ChordGeneratorState extends State<ChordGenerator> {
           onChanged: (bool? value) {
             setState(() {
               chordTypeChecks["Major"] = value!;
-              generateChords();
+              if (value) {
+                generateChords();
+              } else {
+                deleteChords();
+              }
             });
           },
         ),
@@ -223,9 +238,8 @@ class ChordGeneratorState extends State<ChordGenerator> {
             });
           },
         ),
-        Text(
-          "these are the chords for the scale you have selected (HARDCODED for now): $chords",
-        ),
+        for (var i = 0; i < chords.length; i++)
+          Text("chord $i: ${chords[i].midiNotes}"),
       ],
     );
   }
