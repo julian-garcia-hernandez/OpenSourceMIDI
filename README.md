@@ -1,7 +1,7 @@
 # OpenSourceMIDI
 
 ## Purpose
-This goal of this app is to help you learn how to play and recognize chords in music.
+This goal of this app is to teach musicians how to play chords using any MIDI controller/keyboard of their choice.
 
 ## How To Build And Run
 ### Requirements
