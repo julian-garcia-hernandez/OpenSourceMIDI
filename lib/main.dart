@@ -206,7 +206,6 @@ class ChordGeneratorState extends State<ChordGenerator> {
         chordMidiNotes.clear();
       }
     }
-    debugPrint("$chords");
   }
 
   void deleteChords() {
