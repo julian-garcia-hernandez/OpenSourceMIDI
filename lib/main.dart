@@ -19,6 +19,8 @@ class MainApp extends StatelessWidget {
   }
 }
 
+const int keysAmount = 12;
+
 enum DiatonicMode {
   ionian,
   dorian,
