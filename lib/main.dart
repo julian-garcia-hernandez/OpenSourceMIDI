@@ -61,6 +61,21 @@ enum Tonic {
   final int midiNote;
 }
 
+Map<Tonic, String> letterRepresentation = {
+  Tonic.c : "C",
+  Tonic.cSharp : "C#",
+  Tonic.d : "D",
+  Tonic.dSharp : "D#",
+  Tonic.e : "E",
+  Tonic.f : "F",
+  Tonic.fSharp : "F#",
+  Tonic.g : "G",
+  Tonic.gSharp : "G#",
+  Tonic.a : "A",
+  Tonic.aSharp : "A#",
+  Tonic.b : "B",
+};
+
 class ScaleGenerator extends StatefulWidget {
   const ScaleGenerator({super.key});
 
