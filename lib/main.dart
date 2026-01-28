@@ -43,7 +43,7 @@ Map<DiatonicMode, List<int>> intervalSequencing = {
 
 enum ChordType { major, minor }
 
-enum Tonic {
+enum Note {
   c(60),
   cSharp(61),
   d(62),
@@ -57,23 +57,23 @@ enum Tonic {
   aSharp(70),
   b(71);
 
-  const Tonic(this.midiNote);
+  const Note(this.midiNote);
   final int midiNote;
 }
 
-Map<Tonic, String> letterRepresentation = {
-  Tonic.c : "C",
-  Tonic.cSharp : "C#",
-  Tonic.d : "D",
-  Tonic.dSharp : "D#",
-  Tonic.e : "E",
-  Tonic.f : "F",
-  Tonic.fSharp : "F#",
-  Tonic.g : "G",
-  Tonic.gSharp : "G#",
-  Tonic.a : "A",
-  Tonic.aSharp : "A#",
-  Tonic.b : "B",
+Map<Note, String> noteAsLetter = {
+  Note.c : "C",
+  Note.cSharp : "C#",
+  Note.d : "D",
+  Note.dSharp : "D#",
+  Note.e : "E",
+  Note.f : "F",
+  Note.fSharp : "F#",
+  Note.g : "G",
+  Note.gSharp : "G#",
+  Note.a : "A",
+  Note.aSharp : "A#",
+  Note.b : "B",
 };
 
 class ScaleGenerator extends StatefulWidget {
@@ -87,7 +87,7 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
   List<int>? generatedScale = [60, 62, 64, 65, 67, 69, 71, 72],
       intervalSequence = [];
   DiatonicMode? selectedMode = DiatonicMode.ionian;
-  Tonic selectedTonic = Tonic.c;
+  Note selectedTonic = Note.c;
 
   void generateScale() {
     int intervalSum = 0;
@@ -140,7 +140,7 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
           ],
           onSelected: (String? tonic) {
             setState(() {
-              selectedTonic = Tonic.values.byName(tonic!);
+              selectedTonic = Note.values.byName(tonic!);
               generateScale();
             });
           },
