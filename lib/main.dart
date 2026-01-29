@@ -44,21 +44,26 @@ Map<DiatonicMode, List<int>> intervalSequencing = {
 enum ChordType { major, minor }
 
 enum Note {
-  c(60),
-  cSharp(61),
-  d(62),
-  dSharp(63),
-  e(64),
-  f(65),
-  fSharp(66),
-  g(67),
-  gSharp(68),
-  a(69),
-  aSharp(70),
-  b(71);
+  c(midiNote: 60, letterNote: "C"),
+  cSharp(midiNote: 61, letterNote: "C#"),
+  d(midiNote: 62, letterNote: "D"),
+  dSharp(midiNote: 3, letterNote: "D#"),
+  e(midiNote: 64, letterNote: "E"),
+  f(midiNote: 65, letterNote: "F"),
+  fSharp(midiNote: 66, letterNote: "F#"),
+  g(midiNote: 67, letterNote: "G"),
+  gSharp(midiNote: 68, letterNote: "G#"),
+  a(midiNote: 69, letterNote: "A"),
+  aSharp(midiNote: 70, letterNote: "A#"),
+  b(midiNote: 71, letterNote: "B");
 
-  const Note(this.midiNote);
+  const Note({
+    required this.midiNote,
+    required this.letterNote,
+  });
+
   final int midiNote;
+  final String letterNote;
 }
 
 Map<Note, String> noteAsLetter = {
@@ -180,7 +185,7 @@ Map<ChordType, List<int>> chordIntervals = {
 class Chord {
   Chord({required this.type, required this.midiNotes});
   ChordType type;
-  List<int> midiNotes = [];
+  List<Note> midiNotes = [];
 }
 
 class ChordGenerator extends StatefulWidget {
@@ -196,7 +201,7 @@ class ChordGeneratorState extends State<ChordGenerator> {
   Map<String, bool> chordTypeChecks = {"Major": false, "Minor": false};
   void generateChords() {
     int root = 0, scaleDegree = 0, interval = 0;
-    List<int> chordMidiNotes = [];
+    List<Note> chordMidiNotes = [];
     midiScale = InheritedScale.of(context).scale;
     midiIntervals = midiScale.map<int>((midiNote) {
       midiNote %= 12;
@@ -212,7 +217,7 @@ class ChordGeneratorState extends State<ChordGenerator> {
           chordMidiNotes.clear();
           break;
         }
-        chordMidiNotes.add(scaleDegree);
+        chordMidiNotes.add(Note.values[scaleDegree % 12]);
       }
       if (chordMidiNotes.isNotEmpty) {
         chords.add(
@@ -254,8 +259,8 @@ class ChordGeneratorState extends State<ChordGenerator> {
             });
           },
         ),
-        for (var i = 0; i < chords.length; i++)
-          Text("chord $i: ${chords[i].midiNotes}"),
+        for (int i = 0; i < chords.length; i++)
+          Text("chord $i: ${chords[i].midiNotes}")
       ],
     );
   }
