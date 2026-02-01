@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
+import 'package:piano/piano.dart';
 
 void main() {
   runApp(const MainApp());
@@ -43,7 +44,7 @@ Map<DiatonicMode, List<int>> intervalSequencing = {
 
 enum ChordType { major, minor }
 
-enum Note {
+enum NoteX {
   c(midiNote: 60, letterNote: "C"),
   cSharp(midiNote: 61, letterNote: "C#"),
   d(midiNote: 62, letterNote: "D"),
@@ -66,20 +67,6 @@ enum Note {
   final String letterNote;
 }
 
-Map<Note, String> noteAsLetter = {
-  Note.c : "C",
-  Note.cSharp : "C#",
-  Note.d : "D",
-  Note.dSharp : "D#",
-  Note.e : "E",
-  Note.f : "F",
-  Note.fSharp : "F#",
-  Note.g : "G",
-  Note.gSharp : "G#",
-  Note.a : "A",
-  Note.aSharp : "A#",
-  Note.b : "B",
-};
 
 class ScaleGenerator extends StatefulWidget {
   const ScaleGenerator({super.key});
@@ -89,19 +76,19 @@ class ScaleGenerator extends StatefulWidget {
 }
 
 class ScaleGeneratorState extends State<ScaleGenerator> {
-  List<int>? generatedScale = [60, 62, 64, 65, 67, 69, 71, 72],
-      intervalSequence = [];
+  List<Note>? generatedScale = [Note.C, Note.D, Note.E, Note.F, Note.G, Note.A, Note.B];
+  List<int>? intervalSequence = [];
   DiatonicMode? selectedMode = DiatonicMode.ionian;
-  Note selectedTonic = Note.c;
+  NotePosition selectedTonic = NotePosition(note: Note.C, octave: 4);
 
   void generateScale() {
     int intervalSum = 0;
     intervalSequence = intervalSequencing[selectedMode];
     generatedScale = intervalSequence?.map((interval) {
       intervalSum += interval;
-      return selectedTonic.midiNote + intervalSum;
+      return selectedTonic.pitch + intervalSum;
     }).toList();
-    generatedScale?.insert(0, selectedTonic.midiNote);
+    generatedScale?.insert(0, selectedTonic);
   }
 
   @override
@@ -153,7 +140,9 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
         Text(
           "this is the generated scale in its midi numbered format $generatedScale",
         ),
-        InheritedScale(scale: generatedScale!, child: ChordGenerator()),
+        InheritedScale(scale: generatedScale!, child: Column(
+          children: [InteractivePiano(noteRange: NoteRange(from: NotePosition(note: Note.C, octave: 3), to: NotePosition(note: Note.C, octave: 4)),), ChordGenerator()],
+        )),
       ],
     );
   }
@@ -162,7 +151,7 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
 //this is immutable, it will only pass data down to its children, chord generator which will then generate the chords
 class InheritedScale extends InheritedWidget {
   const InheritedScale({super.key, required this.scale, required super.child});
-  final List<int> scale;
+  final List<Note> scale;
   static InheritedScale? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<InheritedScale>();
   }
