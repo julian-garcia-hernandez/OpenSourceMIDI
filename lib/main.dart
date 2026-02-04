@@ -120,6 +120,8 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
                   Accidental.values,
                   "Sharp",
                 );
+              } else {
+                accidental = EnumToString.fromString(Accidental.values, "None");
               }
 
               //get note from the enum class
