@@ -52,19 +52,23 @@ class ScaleGenerator extends StatefulWidget {
 }
 
 class ScaleGeneratorState extends State<ScaleGenerator> {
-  List<Note>? generatedScale = [Note.C, Note.D, Note.E, Note.F, Note.G, Note.A, Note.B];
+  List<int>? generatedScale = [60, 62, 64, 65, 67, 69, 71, 72];
+
   List<int>? intervalSequence = [];
   DiatonicMode? selectedMode = DiatonicMode.ionian;
   NotePosition selectedTonic = NotePosition(note: Note.C, octave: 4);
+  int octave = 4;
+  Accidental? accidental = Accidental.None;
 
   void generateScale() {
     int intervalSum = 0;
     intervalSequence = intervalSequencing[selectedMode];
+    var tonicPitch = selectedTonic.pitch;
     generatedScale = intervalSequence?.map((interval) {
       intervalSum += interval;
-      return selectedTonic.pitch + intervalSum;
+      return tonicPitch + intervalSum;
     }).toList();
-    generatedScale?.insert(0, selectedTonic);
+    generatedScale?.insert(0, selectedTonic.pitch);
   }
 
   @override
@@ -93,22 +97,37 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
         DropdownMenu(
           label: Text("Tonic"),
           dropdownMenuEntries: <DropdownMenuEntry<String>>[
-            DropdownMenuEntry(value: "c", label: "C"),
-            DropdownMenuEntry(value: "cSharp", label: "C#"),
-            DropdownMenuEntry(value: "d", label: "D"),
-            DropdownMenuEntry(value: "dSharp", label: "D#"),
-            DropdownMenuEntry(value: "e", label: "E"),
-            DropdownMenuEntry(value: "f", label: "F"),
-            DropdownMenuEntry(value: "fSharp", label: "F#"),
-            DropdownMenuEntry(value: "g", label: "G"),
-            DropdownMenuEntry(value: "gSharp", label: "G#"),
-            DropdownMenuEntry(value: "a", label: "A"),
-            DropdownMenuEntry(value: "aSharp", label: "A#"),
-            DropdownMenuEntry(value: "b", label: "B"),
+            DropdownMenuEntry(value: "C", label: "C"),
+            DropdownMenuEntry(value: "C#", label: "C#"),
+            DropdownMenuEntry(value: "D", label: "D"),
+            DropdownMenuEntry(value: "D#", label: "D#"),
+            DropdownMenuEntry(value: "E", label: "E"),
+            DropdownMenuEntry(value: "F", label: "F"),
+            DropdownMenuEntry(value: "F#", label: "F#"),
+            DropdownMenuEntry(value: "G", label: "G"),
+            DropdownMenuEntry(value: "G#", label: "G#"),
+            DropdownMenuEntry(value: "A", label: "A"),
+            DropdownMenuEntry(value: "A#", label: "A#"),
+            DropdownMenuEntry(value: "B", label: "B"),
           ],
-          onSelected: (String? tonic) {
+          onSelected: (String? selectedNote) {
             setState(() {
-              selectedTonic = Note.values.byName(tonic!);
+              var noteString = selectedNote?[0];
+              selectedNote = selectedNote?.substring(1); //#5
+              if (selectedNote!.isNotEmpty) {
+                accidental = EnumToString.fromString(
+                  Accidental.values,
+                  "Sharp",
+                );
+              }
+
+              //get note from the enum class
+              var note = EnumToString.fromString(Note.values, noteString!);
+              selectedTonic = NotePosition(
+                note: note!,
+                octave: octave,
+                accidental: accidental!,
+              );
               generateScale();
             });
           },
