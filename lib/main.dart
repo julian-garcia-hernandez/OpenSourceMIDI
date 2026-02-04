@@ -147,7 +147,7 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
 //this is immutable, it will only pass data down to its children, chord generator which will then generate the chords
 class InheritedScale extends InheritedWidget {
   const InheritedScale({super.key, required this.scale, required super.child});
-  final List<Note> scale;
+  final List<int> scale;
   static InheritedScale? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<InheritedScale>();
   }
