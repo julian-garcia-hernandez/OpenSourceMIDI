@@ -135,9 +135,10 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
         Text(
           "this is the generated scale in its midi numbered format $generatedScale",
         ),
-        InheritedScale(scale: generatedScale!, child: Column(
-          children: [InteractivePiano(noteRange: NoteRange(from: NotePosition(note: Note.C, octave: 3), to: NotePosition(note: Note.C, octave: 4)),), ChordGenerator()],
-        )),
+        // InheritedScale(
+        //   scale: generatedScale!,
+        //   child: Column(children: [ChordGenerator()]),
+        // ),
       ],
     );
   }
