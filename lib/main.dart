@@ -44,30 +44,6 @@ Map<DiatonicMode, List<int>> intervalSequencing = {
 
 enum ChordType { major, minor }
 
-enum NoteX {
-  c(midiNote: 60, letterNote: "C"),
-  cSharp(midiNote: 61, letterNote: "C#"),
-  d(midiNote: 62, letterNote: "D"),
-  dSharp(midiNote: 3, letterNote: "D#"),
-  e(midiNote: 64, letterNote: "E"),
-  f(midiNote: 65, letterNote: "F"),
-  fSharp(midiNote: 66, letterNote: "F#"),
-  g(midiNote: 67, letterNote: "G"),
-  gSharp(midiNote: 68, letterNote: "G#"),
-  a(midiNote: 69, letterNote: "A"),
-  aSharp(midiNote: 70, letterNote: "A#"),
-  b(midiNote: 71, letterNote: "B");
-
-  const Note({
-    required this.midiNote,
-    required this.letterNote,
-  });
-
-  final int midiNote;
-  final String letterNote;
-}
-
-
 class ScaleGenerator extends StatefulWidget {
   const ScaleGenerator({super.key});
 
