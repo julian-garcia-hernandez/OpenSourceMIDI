@@ -162,7 +162,7 @@ class InheritedScale extends InheritedWidget {
   bool updateShouldNotify(InheritedScale oldWidget) => scale != oldWidget.scale;
 }
 
-Map<ChordType, List<int>> chordIntervals = {
+Map<ChordType, List<int>> intervals = {
   ChordType.major: [0, 4, 7],
   ChordType.minor: [0, 3, 7],
 };
