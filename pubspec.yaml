@@ -8,15 +8,18 @@ environment:
 
 dependencies:
   async: ^2.13.0
+  enum_to_string: ^2.2.1
   flutter:
     sdk: flutter
   flutter_midi_command: ^0.5.3
   foundation: ^0.0.5
+  piano: ^1.0.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  test: ^1.26.3
 
 flutter:
   uses-material-design: true
