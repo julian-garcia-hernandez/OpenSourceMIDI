@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../widgets/scale_generator.dart';
+import 'package:piano/piano.dart';
 
 class LearnScreen extends StatelessWidget {
   const LearnScreen({super.key});
@@ -7,11 +9,22 @@ class LearnScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Learn Screen")),
-      body: Center(),
+      body: Center(
+        child: Column(
+          children: [
+            // SheetMusicDisplay(),
+            ScaleGenerator(),
+            // InteractivePiano(noteRange: noteRange)
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.music_note), label: "Learn"),
-          // BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"), TODO: gonna implement later
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Profile",
+          ), //TODO: gonna implement later
         ],
       ),
       drawer: Drawer(
