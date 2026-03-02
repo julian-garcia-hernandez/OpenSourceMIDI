@@ -24,8 +24,6 @@ Map<DiatonicMode, List<int>> intervalSequencing = {
   DiatonicMode.locrian: [1, 2, 2, 1, 2, 2, 2],
 };
 
-enum ChordType { major, minor }
-
 class ScaleGenerator extends StatefulWidget {
   const ScaleGenerator({super.key});
 
@@ -126,32 +124,4 @@ class ScaleGeneratorState extends State<ScaleGenerator> {
       ],
     );
   }
-}
-
-class InheritedScale extends InheritedWidget {
-  const InheritedScale({super.key, required this.scale, required super.child});
-  final List<int> scale;
-  static InheritedScale? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<InheritedScale>();
-  }
-
-  static InheritedScale of(BuildContext context) {
-    final InheritedScale? result = maybeOf(context);
-    assert(result != null, 'No InheritedScale found in context');
-    return result!;
-  }
-
-  @override
-  bool updateShouldNotify(InheritedScale oldWidget) => scale != oldWidget.scale;
-}
-
-Map<ChordType, List<int>> intervals = {
-  ChordType.major: [0, 4, 7],
-  ChordType.minor: [0, 3, 7],
-};
-
-class Chord {
-  Chord({required this.type, required this.midiNotes});
-  ChordType type;
-  List<Note> midiNotes = [];
 }
